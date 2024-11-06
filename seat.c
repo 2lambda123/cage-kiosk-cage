@@ -124,14 +124,17 @@ update_capabilities(struct cg_seat *seat)
 	if (!wl_list_empty(&seat->touch)) {
 		caps |= WL_SEAT_CAPABILITY_TOUCH;
 	}
-	wlr_seat_set_capabilities(seat->seat, caps);
 
-	/* Hide cursor if the seat doesn't have pointer capability. */
+	/* Hide cursor if the seat doesn't have pointer capability.
+	 * This must be called while the wlr_seat has the capability
+	 * otherwise it's a no-op. */
 	if ((caps & WL_SEAT_CAPABILITY_POINTER) == 0) {
 		wlr_cursor_unset_image(seat->cursor);
 	} else {
 		wlr_cursor_set_xcursor(seat->cursor, seat->xcursor_manager, DEFAULT_XCURSOR);
 	}
+
+	wlr_seat_set_capabilities(seat->seat, caps);
 }
 
 static void
